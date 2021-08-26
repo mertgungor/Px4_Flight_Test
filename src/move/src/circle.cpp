@@ -210,14 +210,56 @@ frame Drone::camera(){
     
 }
 
+
 int main(int argc, char **argv){
-    ros::init(argc, argv, "handler");
+
+    ros::init(argc, argv, "circle");
     ros::NodeHandle nh;
-    ros::Rate rate(0.2);
+    ros::Rate rate_short(4);
+    ros::Rate rate_long(0.2);
     Drone drone = Drone(nh);
     drone.takeoff(5);
+    float r{5};
+    float x{0};
+    float y{-r};
+    position start = {0,r,5,false};
+    drone.moveGlobal(start);
+    rate_long.sleep();
     while(ros::ok()){
-        position pos = {0,0,5,false};
-        rate.sleep();
+
+        while(x<=r ){
+            x+= 0.2;
+            y = sqrt(r*r-x*x);
+            position pos = {x,y,5,false};
+            drone.moveGlobal(pos);
+            rate_short.sleep();
+        }
+        while(x>=0){
+            x-= 0.2;
+            y = -sqrt(r*r-x*x);
+            position pos = {x,y,5,false};
+            drone.moveGlobal(pos);
+            rate_short.sleep();
+        }
+        while(x>=-r){
+            x-= 0.2;
+            y = -sqrt(r*r-x*x);
+            position pos = {x,y,5,false};
+            drone.moveGlobal(pos);
+            rate_short.sleep();
+        }
+        while(x<=0){
+            x+= 0.2;
+            y = sqrt(r*r-x*x);
+            position pos = {x,y,5,false};
+            drone.moveGlobal(pos);
+            rate_short.sleep();
+        }
+
+       
+        drone.land();
+        return 0;
+        
+        
     }
 }
